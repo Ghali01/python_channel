@@ -9,28 +9,22 @@ void main() {
   PythonChannelPlugin.startChannels(
       debugPath: 'E:\\projects\\python_channel\\flutter_channel\\main.py',
       releasePath: 'example.exe');
-  BytesChannel channel = BytesChannel(name: 'ch1');
-  channel.setHandeler(
-    (data, reply) {
-      print(utf8.decode(data));
-      reply.reply(null);
-    },
-  );
-  channel
-      .send(Uint8List.fromList(utf8.encode('hello world from dart')))
-      .then((value) {
-    if (value != null) {
-      print('rp ' + utf8.decode(value));
-    } else {
-      print('rp null');
-    }
+  JsonChannel channel = JsonChannel(name: 'ch');
+  channel.setHandeler((data, reply) {
+    print('0 $data');
+    reply.reply(null);
   });
-  BytesChannel debugCh = BytesChannel(name: 'debug');
-  debugCh.setHandeler(
-    (data, reply) {
-      print('debug ch ' + utf8.decode(data));
+
+  channel.send({'str': 1}).then((v) => print('rp: $v'));
+  StringChannel channel2 = StringChannel(name: 'ch2');
+  channel2.setHandeler(
+    (p0, p1) {
+      print(p0);
+      p1.reply(null);
     },
   );
+
+  channel2.send('ll').then((v) {});
   runApp(const App());
 }
 

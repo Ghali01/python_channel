@@ -71,7 +71,7 @@ abstract class Channel<T> {
       }
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    print('disconnected');
+    print('disconnected $name');
   }
 
   Uint8List _intToBytes(int value) {
@@ -171,5 +171,35 @@ class BytesChannel extends Channel<Uint8List> {
   @override
   Uint8List encode(Uint8List data) {
     return data;
+  }
+}
+
+class StringChannel extends Channel<String> {
+  StringChannel({required super.name});
+
+  @override
+  Uint8List decode(String data) {
+    return Uint8List.fromList(utf8.encode(data));
+  }
+
+  @override
+  String encode(Uint8List data) {
+    return utf8.decode(data);
+  }
+}
+
+class JsonChannel extends Channel<Object> {
+  JsonChannel({required super.name});
+
+  @override
+  Uint8List decode(Object data) {
+    String json = jsonEncode(data);
+    return Uint8List.fromList(utf8.encode(json));
+  }
+
+  @override
+  Object encode(Uint8List data) {
+    String json = utf8.decode(data);
+    return jsonDecode(json);
   }
 }

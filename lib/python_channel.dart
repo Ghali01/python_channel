@@ -19,6 +19,13 @@ class PythonChannelPlugin {
       _Host.testPath = debugPath;
       _Host.releasePath = releasePath;
       _Host.run().then((value) => print('done'));
+      StringChannel debugChannel = StringChannel(name: 'debug');
+      debugChannel.setHandeler((log, reply) {
+        if (kDebugMode) {
+          print('python channel log: $log');
+        }
+        reply.reply(null);
+      });
     }
   }
 }
