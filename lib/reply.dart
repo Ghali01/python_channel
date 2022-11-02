@@ -2,7 +2,7 @@ part of pythonChannel;
 
 class Reply<T> {
   int msgId;
-  Channel<T> channel;
+  Channel<T, dynamic> channel;
   Reply({
     required this.msgId,
     required this.channel,

@@ -9,9 +9,9 @@ class _Host {
   static Future<void> run() async {
     runing = true;
     if (kDebugMode) {
-      process = await Process.start('python', [testPath]);
+      process = await Process.start('python', [testPath, 'dart']);
     } else {
-      process = await Process.start(getPath(), []);
+      process = await Process.start(getPath(), ['dart ']);
     }
 
     process.stderr.transform(utf8.decoder).listen(print);

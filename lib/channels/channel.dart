@@ -1,26 +1,32 @@
 part of pythonChannel;
 
-abstract class Channel<T> {
+abstract class Channel<O, I> {
   String name;
   Socket? _socket;
   late Stream<_Message> _dataMessages;
   late Stream<_Message> _replyMessages;
-  void Function(T, Reply<T>)? _handellr;
+  void Function(I, Reply<O>)? _handellr;
   Channel({
     required this.name,
   }) {
     _connect().then((value) => null);
     _dataMessages = _listenToDataMessage().asBroadcastStream();
-    _dataMessages.where((event) => !event.isReply).listen((event) {
-      if (_handellr != null) {
-        Reply<T> reply = Reply(msgId: event.id, channel: this);
-        _handellr!(encode(event.data), reply);
-      }
-    });
+
+    _startListenOnMsgs();
+
     _replyMessages =
         _dataMessages.where((event) => event.isReply).asBroadcastStream();
   }
-  void setHandeler(void Function(T, Reply) handeler) => _handellr = handeler;
+  void setHandeler(void Function(I, Reply<O>) handeler) => _handellr = handeler;
+
+  void _startListenOnMsgs() {
+    _dataMessages.where((event) => !event.isReply).listen((event) {
+      if (_handellr != null) {
+        Reply<O> reply = Reply(msgId: event.id, channel: this);
+        _handellr!(encodeInput(event.data), reply);
+      }
+    });
+  }
 
   Future<void> _connect() async {
     while (_Host.port == null) {
@@ -28,7 +34,9 @@ abstract class Channel<T> {
     }
     _socket = await Socket.connect('127.0.0.1', _Host.port!);
     Uint8List nameMsg = Uint8List.fromList([...utf8.encode(name), 0, 0, 0]);
-    _socket!.add(nameMsg);
+    try {
+      _socket!.add(nameMsg);
+    } catch (e) {}
   }
 
   int? _checkOnPerfex(List buffer) {
@@ -47,8 +55,13 @@ abstract class Channel<T> {
     }
   }
 
-  T encode(Uint8List data);
-  Uint8List decode(T data);
+  O encodeOutput(Uint8List data);
+
+  Uint8List decodeOutput(O data);
+  I encodeInput(Uint8List data);
+
+  Uint8List decodeInput(I data);
+
   Stream<_Message> _listenToDataMessage() async* {
     while (_socket == null) {
       await Future.delayed(const Duration(milliseconds: 10));
@@ -129,7 +142,7 @@ abstract class Channel<T> {
     return _intToBytes(id);
   }
 
-  Future<T?> send(T msg) async {
+  Future<O?> send(I msg) async {
     while (_socket == null) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
@@ -137,69 +150,30 @@ abstract class Channel<T> {
     Uint8List id = _genID();
     msgBuffer.addAll(id);
     msgBuffer.add(0);
-    msgBuffer.addAll(decode(msg));
+    msgBuffer.addAll(decodeInput(msg));
     msgBuffer.addAll([0, 0, 0]);
-    _socket!.add(msgBuffer);
+
+    try {
+      _socket!.add(msgBuffer);
+    } catch (e) {}
     _Message reply = await _replyMessages
         .where((event) => event.id == _bytesToInt(id))
         .first;
     if (reply.data.isNotEmpty) {
-      return encode(reply.data);
+      return encodeOutput(reply.data);
     }
   }
 
-  void _sendReply(T? msg, int id) async {
+  void _sendReply(O? msg, int id) async {
     List<int> msgBuffer = [];
     msgBuffer.addAll(_intToBytes(id));
     msgBuffer.add(1);
     if (msg != null) {
-      msgBuffer.addAll(decode(msg));
+      msgBuffer.addAll(decodeOutput(msg));
     }
     msgBuffer.addAll([0, 0, 0]);
-    _socket!.add(msgBuffer);
-  }
-}
-
-class BytesChannel extends Channel<Uint8List> {
-  BytesChannel({required super.name});
-
-  @override
-  Uint8List decode(Uint8List data) {
-    return data;
-  }
-
-  @override
-  Uint8List encode(Uint8List data) {
-    return data;
-  }
-}
-
-class StringChannel extends Channel<String> {
-  StringChannel({required super.name});
-
-  @override
-  Uint8List decode(String data) {
-    return Uint8List.fromList(utf8.encode(data));
-  }
-
-  @override
-  String encode(Uint8List data) {
-    return utf8.decode(data);
-  }
-}
-
-class JsonChannel extends Channel<Object> {
-  JsonChannel({required super.name});
-
-  @override
-  Uint8List decode(Object data) {
-    String json = jsonEncode(data);
-    return Uint8List.fromList(utf8.encode(json));
-  }
-
-  @override
-  Object encode(Uint8List data) {
-    String json = utf8.decode(data);
-    return jsonDecode(json);
+    try {
+      _socket!.add(msgBuffer);
+    } catch (e) {}
   }
 }
