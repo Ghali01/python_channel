@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// This class present chanell that send and recive bytes [Uint8List]
 class BytesChannel extends Channel<Uint8List, Uint8List> {
   BytesChannel({required super.name});
 

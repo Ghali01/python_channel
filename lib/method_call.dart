@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// class represent method call through [MethodChannel]
 class MethodCall {
   String method;
   late Object args;

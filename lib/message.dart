@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// class represent message through channels
 class _Message {
   int id;
   bool isReply;

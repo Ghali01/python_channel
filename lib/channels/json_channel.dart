@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// This class present chanell that send and recive json [Map] or [List]
 class JsonChannel extends Channel<Object, Object> {
   JsonChannel({required super.name});
 

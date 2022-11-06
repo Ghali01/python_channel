@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// this class is used to send reply on message
 class Reply<T> {
   int msgId;
   Channel<T, dynamic> channel;

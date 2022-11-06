@@ -1,5 +1,6 @@
 part of pythonChannel;
 
+/// This class present chanell that send and recive String
 class StringChannel extends Channel<String, String> {
   StringChannel({required super.name});
 

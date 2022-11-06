@@ -24,26 +24,45 @@ part 'message.dart';
 part 'reply.dart';
 part 'method_call.dart';
 
+/// the main class in the package
 class PythonChannelPlugin {
+  /// the entry point for the package
+  ///
+  /// [debugPyPath] the path of the python file
+  /// [debugExePath] the path of the exe file in debug mode
+  /// [releasePath] the relative path of the exe file in release mode
   static void startChannels(
-      {required String debugPath, required String releasePath}) async {
+      {required String debugPyPath,
+      required String releasePath,
+      String? debugExePath}) async {
     if (!_Host.runing) {
       WidgetsFlutterBinding.ensureInitialized();
-      _Host.testPath = debugPath;
+      _Host.testPyPath = debugPyPath;
       _Host.releasePath = releasePath;
-      _Host.run().then((value) => print('done'));
-      StringChannel debugChannel = StringChannel(name: '|debug|');
-      FlutterWindowClose.setWindowShouldCloseHandler(() async {
-        await debugChannel._socket?.close();
+      _Host.testExePath = debugExePath;
+      _Host.run().then((value) => null);
 
-        return true;
-      });
-      debugChannel.setHandeler((log, reply) {
+      // set up debug channel
+      StringChannel debugChannel = StringChannel(name: '|debug|');
+
+      debugChannel.setHandler((log, reply) {
         if (kDebugMode && !(log.length == 1 && log.codeUnits.first == 10)) {
           print('python channel log: $log');
         }
         reply.reply(null);
       });
+
+      FlutterWindowClose.setWindowShouldCloseHandler(() async {
+        await debugChannel._socket?.close();
+        if (_Host.onClose != null) {
+          _Host.onClose!();
+        }
+        await Future.delayed(const Duration(seconds: 1));
+        return true;
+      });
     }
   }
+
+  /// set close application event
+  static setOnClose(void Function() onClose) => _Host.onClose = onClose;
 }

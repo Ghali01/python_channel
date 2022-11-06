@@ -52,14 +52,16 @@ class MethodChannel extends Channel<Object, MethodCall> {
     _Message reply = await _replyMessages
         .where((event) => event.id == _bytesToInt(id))
         .first;
-    switch (reply.data.first) {
-      case 1:
-        throw encodeException(reply.data);
+    if (reply.data.isNotEmpty) {
+      switch (reply.data.first) {
+        case 1:
+          throw encodeException(reply.data);
 
-      default:
-        if (reply.data.isNotEmpty) {
-          return encodeOutput(reply.data);
-        }
+        default:
+          if (reply.data.isNotEmpty) {
+            return encodeOutput(reply.data);
+          }
+      }
     }
   }
 
@@ -71,10 +73,10 @@ class MethodChannel extends Channel<Object, MethodCall> {
   @override
   void _startListenOnMsgs() {
     _dataMessages.where((event) => !event.isReply).listen((event) {
-      if (_handellr != null) {
+      if (_handler != null) {
         Reply<Object> reply = Reply(msgId: event.id, channel: this);
         try {
-          _handellr!(encodeInput(event.data), reply);
+          _handler!(encodeInput(event.data), reply);
         } on PythonMethodException catch (e) {
           _sendException(e, event.id);
         }
