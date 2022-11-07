@@ -2,23 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:python_channel/python_channel.dart';
 
 void main() {
   PythonChannelPlugin.startChannels(
-      debugExePath:
-          'E:\\projects\\python_channel\\flutter_channel\\dist\\main.exe',
-      debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\main.py',
+      // debugExePath:
+      //     'E:\\projects\\python_channel\\flutter_channel\\dist\\example.exe',
+      debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\example.py',
       releasePath: 'main.exe');
-  BytesChannel bytesChannel = BytesChannel(name: 'channel1');
-  StringChannel stringChannel = StringChannel(name: 'channel2');
-  JsonChannel jsonChannel = JsonChannel(name: 'channel3');
-  MethodChannel methodChannel = MethodChannel(name: 'channel4');
-  methodChannel
-      .invokeMethod('sayHello', {"name": 'ghale'})
-      .then((reply) => print(reply))
-      .catchError((e) {});
+
   runApp(const App());
 }
 
