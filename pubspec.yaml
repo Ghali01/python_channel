@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_window_close: ^0.2.2
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:

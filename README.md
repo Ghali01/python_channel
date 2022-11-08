@@ -13,9 +13,11 @@ This plugin depends on unix sockets (TCP) protocol.
 
 ## how to use?
 
-### 1. start the host
+### 1. bind the hosts
 
-First thing You need to do start the host by calling `startChannels`, this method take 3 parameters `debugPyPath`,`releasePath` and `debugExePath`(optional)
+First thing you  have to  bind the hosts by calling `PythonChannelPlugin.bindHost()` this method take 4 parameters `name`,`debugPyPath`,`debugExePath`,`releasePath`, You can bind multi hosts.
+
+`name` is unique name for the host
 
 `debugPyPath` it is the absolute path of the main python file. The plugin will use it to start the host in debug mode if `debugExePath` is not set.
 
@@ -26,16 +28,28 @@ First thing You need to do start the host by calling `startChannels`, this metho
 #### host example
 
 ```dart
-PythonChannelPlugin.startChannels(
+PythonChannelPlugin.bindHost(
+      name: 'host',
       debugExePath:
-          'E:\\projects\\python_channel\\flutter_channel\\dist\\main.exe',
-      debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\main.py',
+          'E:\\projects\\python_channel\\flutter_channel\\dist\\example.exe',
+      debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\example.py',
       releasePath: 'main.exe');
+
 ```
 
-### 2. create channels
+##### where put the executable file in release mode?
 
-There is number of built in channel types to use like:  `BytesChannel`,`JsonChannel`, `StringChannel` and `MethodChannel`.
+```tree
+  release-app/
+    data/
+    app.exe # the executable file for the flutter app
+    main.exe # the executable file that compiled from python
+    ...
+```
+
+### 2. create channels and bind it to host
+
+There is number of built in channel types to use like:  `BytesChannel`,`JsonChannel`, `StringChannel` and `MethodChannel`, after you create the channel you have to bind it to host using `PythonChannelPlugin.bindChannel()` this method take two parameters first one is `name` is the name of the host and second one is `channel`.
 
 #### channels examples
 
@@ -45,6 +59,12 @@ There is number of built in channel types to use like:  `BytesChannel`,`JsonChan
   StringChannel stringChannel = StringChannel(name: 'channel2');
   JsonChannel jsonChannel = JsonChannel(name: 'channel3');
   MethodChannel methodChannel = MethodChannel(name: 'channel4');
+  // bind channels
+  PythonChannelPlugin.bindChannel('host', bytesChannel);
+  PythonChannelPlugin.bindChannel('host', stringChannel);
+  PythonChannelPlugin.bindChannel('host', jsonChannel);
+  PythonChannelPlugin.bindChannel('host', methodChannel);
+
 ```
 
 ### 3. set channel handler
@@ -136,4 +156,5 @@ where the **input** is what the channel send and the **output** is what the chan
 
 ## release mode
 
-in release mode you have to compile you main python file to an executable file, We recommend you to use [PyInstaller](https://pypi.org/project/pyinstaller/).
+in release mode you have to compile your main python file to an executable file, We recommend you to use [PyInstaller](https://pypi.org/project/pyinstaller/).
+**Note: you have to build the executable file with console otherwise the package will not work**

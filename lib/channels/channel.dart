@@ -8,6 +8,7 @@ abstract class Channel<O, I> {
   Socket? _socket;
   late Stream<_Message> _dataMessages;
   late Stream<_Message> _replyMessages;
+  int? _port;
   void Function(I, Reply<O>)? _handler;
   Channel({
     required this.name,
@@ -36,10 +37,10 @@ abstract class Channel<O, I> {
 
   /// conect to the tcp socket
   Future<void> _connect() async {
-    while (_Host.port == null) {
+    while (_port == null) {
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    _socket = await Socket.connect('127.0.0.1', _Host.port!);
+    _socket = await Socket.connect('127.0.0.1', _port!);
     Uint8List nameMsg = Uint8List.fromList([...utf8.encode(name), 0, 0, 0]);
     try {
       _socket!.add(nameMsg);

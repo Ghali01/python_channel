@@ -1,15 +1,22 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:python_channel/python_channel.dart';
 
 void main() {
-  PythonChannelPlugin.startChannels(
-      // debugExePath:
-      //     'E:\\projects\\python_channel\\flutter_channel\\dist\\example.exe',
-      debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\example.py',
-      releasePath: 'main.exe');
+  WidgetsFlutterBinding.ensureInitialized();
+  PythonChannelPlugin.bindHost(
+      name: 'calculator',
+      debugExePath:
+          'E:\\projects\\python_channel\\flutter_channel\\dist\\calculator.exe',
+      debugPyPath:
+          'E:\\projects\\python_channel\\flutter_channel\\calculator-example.py',
+      releasePath: 'calculator.exe');
+  PythonChannelPlugin.bindHost(
+      name: 'sayHello',
+      debugExePath:
+          'E:\\projects\\python_channel\\flutter_channel\\dist\\sayHello.exe',
+      debugPyPath:
+          'E:\\projects\\python_channel\\flutter_channel\\sayHello-example.py',
+      releasePath: 'sayHello.exe');
 
   runApp(const App());
 }
@@ -33,26 +40,37 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late final MethodChannel channel;
+  late final MethodChannel calculatorChannel;
+  late final MethodChannel helloChannel;
   String res = '';
+  String hi = '';
   final TextEditingController controller1 = TextEditingController(),
-      controller2 = TextEditingController();
+      controller2 = TextEditingController(),
+      controller3 = TextEditingController();
   @override
   void initState() {
     super.initState();
-    channel = MethodChannel(name: 'ch');
+    calculatorChannel = MethodChannel(name: 'ch');
+    PythonChannelPlugin.bindChannel('calculator', calculatorChannel);
+    helloChannel = MethodChannel(name: 'sayHi');
+    PythonChannelPlugin.bindChannel('sayHello', helloChannel);
   }
 
   void getResault(String op) async {
-    DateTime d1 = DateTime.now();
-    double res = await channel.invokeMethod(op, [
+    double res = await calculatorChannel.invokeMethod(op, [
       double.parse(controller1.text),
       double.parse(controller2.text)
     ]) as double;
-    DateTime d2 = DateTime.now();
-    print('${d2.difference(d1).inMilliseconds} ms');
     setState(() {
       this.res = res.toString();
+    });
+  }
+
+  void getHello() async {
+    var msg =
+        await helloChannel.invokeMethod('sayHello', {'name': controller3.text});
+    setState(() {
+      hi = msg.toString();
     });
   }
 
@@ -106,7 +124,21 @@ class _HomeState extends State<Home> {
                         style: TextStyle(fontSize: 25),
                       )),
                 ],
-              )
+              ),
+              TextField(
+                controller: controller3,
+                decoration: const InputDecoration(hintText: 'your name'),
+              ),
+              Text(
+                hi,
+                style: const TextStyle(fontSize: 27),
+              ),
+              TextButton(
+                  onPressed: getHello,
+                  child: const Text(
+                    'say hi',
+                    style: TextStyle(fontSize: 25),
+                  )),
             ],
           ),
         ),
