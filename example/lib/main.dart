@@ -5,15 +5,15 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   PythonChannelPlugin.bindHost(
       name: 'calculator',
-      debugExePath:
-          'E:\\projects\\python_channel\\flutter_channel\\dist\\calculator.exe',
+      // debugExePath:
+      //     'E:\\projects\\python_channel\\flutter_channel\\dist\\calculator.exe',
       debugPyPath:
           'E:\\projects\\python_channel\\flutter_channel\\calculator-example.py',
       releasePath: 'calculator.exe');
   PythonChannelPlugin.bindHost(
       name: 'sayHello',
-      debugExePath:
-          'E:\\projects\\python_channel\\flutter_channel\\dist\\sayHello.exe',
+      // debugExePath:
+      // 'E:\\projects\\python_channel\\flutter_channel\\dist\\sayHello.exe',
       debugPyPath:
           'E:\\projects\\python_channel\\flutter_channel\\sayHello-example.py',
       releasePath: 'sayHello.exe');
