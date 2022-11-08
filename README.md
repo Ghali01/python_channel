@@ -5,7 +5,7 @@ With this plugin developers can use python in there flutter applications on wind
 ## requirements
 
 + python +3.7
-+ flutter_channel python package install it from [PyPi](https://pypi.org/project/flutter-channel/).
++ flutter_channel python package, install it from [PyPi](https://pypi.org/project/flutter-channel/).
 
 ## how does it work?
 
@@ -34,7 +34,6 @@ PythonChannelPlugin.bindHost(
           'E:\\projects\\python_channel\\flutter_channel\\dist\\example.exe',
       debugPyPath: 'E:\\projects\\python_channel\\flutter_channel\\example.py',
       releasePath: 'main.exe');
-
 ```
 
 ##### where put the executable file in release mode?

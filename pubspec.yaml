@@ -1,7 +1,9 @@
 name: python_channel
-description: A new Flutter plugin project.
+description: with this package developers can use python with flutter
 version: 0.0.1
-homepage:
+homepage: https://github.com/Ghali01/python_channel
+repository: https://github.com/Ghali01/python_channel
+issue_tracker: https://github.com/Ghali01/python_channel/issues
 
 environment:
   sdk: '>=2.18.2 <3.0.0'

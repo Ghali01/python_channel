@@ -1,11 +1,8 @@
 library pythonChannel;
 
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 part 'host.dart';
@@ -28,7 +25,7 @@ part 'method_call.dart';
 class PythonChannelPlugin {
   static Map<String, _Host> _hosts = {};
 
-  /// the entry point for the package
+  /// bind new python host
   ///
   /// [debugPyPath] the path of the python file
   /// [debugExePath] the path of the exe file in debug mode
@@ -45,6 +42,7 @@ class PythonChannelPlugin {
     _hosts[name] = host;
   }
 
+  /// bind channel to host
   static void bindChannel(String hostName, Channel channel) {
     if (_hosts.containsKey(hostName)) {
       _hosts[hostName]!.bindChannel(channel);
