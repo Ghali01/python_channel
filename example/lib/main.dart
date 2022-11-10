@@ -17,7 +17,10 @@ void main() {
       debugPyPath:
           'E:\\projects\\python_channel\\flutter_channel\\sayHello-example.py',
       releasePath: 'sayHello.exe');
-
+  MethodChannel calculatorChannel = MethodChannel(name: 'ch');
+  PythonChannelPlugin.bindChannel('calculator', calculatorChannel);
+  MethodChannel helloChannel = MethodChannel(name: 'sayHi');
+  PythonChannelPlugin.bindChannel('sayHello', helloChannel);
   runApp(const App());
 }
 
@@ -44,16 +47,18 @@ class _HomeState extends State<Home> {
   late final MethodChannel helloChannel;
   String res = '';
   String hi = '';
+  bool binded = true;
   final TextEditingController controller1 = TextEditingController(),
       controller2 = TextEditingController(),
       controller3 = TextEditingController();
   @override
   void initState() {
     super.initState();
-    calculatorChannel = MethodChannel(name: 'ch');
-    PythonChannelPlugin.bindChannel('calculator', calculatorChannel);
-    helloChannel = MethodChannel(name: 'sayHi');
-    PythonChannelPlugin.bindChannel('sayHello', helloChannel);
+
+    calculatorChannel =
+        PythonChannelPlugin.getChannel('calculator', 'ch') as MethodChannel;
+    helloChannel =
+        PythonChannelPlugin.getChannel('sayHello', 'sayHi') as MethodChannel;
   }
 
   void getResault(String op) async {
@@ -71,6 +76,14 @@ class _HomeState extends State<Home> {
         await helloChannel.invokeMethod('sayHello', {'name': controller3.text});
     setState(() {
       hi = msg.toString();
+    });
+  }
+
+  void unbind() {
+    PythonChannelPlugin.unbindHost('sayHello');
+
+    setState(() {
+      binded = false;
     });
   }
 
@@ -125,20 +138,32 @@ class _HomeState extends State<Home> {
                       )),
                 ],
               ),
-              TextField(
-                controller: controller3,
-                decoration: const InputDecoration(hintText: 'your name'),
-              ),
-              Text(
-                hi,
-                style: const TextStyle(fontSize: 27),
-              ),
-              TextButton(
-                  onPressed: getHello,
-                  child: const Text(
-                    'say hi',
-                    style: TextStyle(fontSize: 25),
-                  )),
+              binded
+                  ? Column(
+                      children: [
+                        TextField(
+                          controller: controller3,
+                          decoration:
+                              const InputDecoration(hintText: 'your name'),
+                        ),
+                        Text(
+                          hi,
+                          style: const TextStyle(fontSize: 27),
+                        ),
+                        TextButton(
+                            onPressed: getHello,
+                            child: const Text(
+                              'say hi',
+                              style: TextStyle(fontSize: 25),
+                            )),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        ElevatedButton(
+                            onPressed: unbind, child: const Text('unbind'))
+                      ],
+                    )
+                  : const SizedBox()
             ],
           ),
         ),

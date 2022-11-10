@@ -112,10 +112,10 @@ packages:
   python_channel:
     dependency: "direct main"
     description:
-      name: python_channel
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.1"
+      path: ".."
+      relative: true
+    source: path
+    version: "0.0.2"
   sky_engine:
     dependency: transitive
     description: flutter

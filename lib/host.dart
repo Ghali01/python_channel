@@ -8,7 +8,9 @@ class _Host {
   late Process _process;
   bool runing = false;
   static int? _port;
-  List<Channel> _channels = [];
+
+  Map<String, Channel> _channels = {};
+  StreamSubscription? _stderrSub;
 
   /// [debugPyPath] the path of the python file
   /// [debugExePath] the path of the exe file in debug mode
@@ -46,27 +48,27 @@ class _Host {
       _process = await Process.start(_getPath(), ['dart']);
     }
 
-    _process.stderr.transform(utf8.decoder).listen(print);
-    List<int> pb = await _process.stdout.first;
-    String sp = utf8.decode(pb);
     try {
-      // int p = 54111;
-      int p = int.parse(sp);
+      _stderrSub = _process.stderr.listen((e) => print(utf8.decode(e)));
+      List<int> pb = await _process.stdout.first;
+      String sp = utf8.decode(pb);
+      try {
+        // int p = 54111;
+        int p = int.parse(sp);
 
-      _port = p;
-      _channels.forEach((element) => element._port = p);
-    } catch (e) {
-      throw PythonChannelRunError(output: sp);
-    }
-    await _process.exitCode;
+        _port = p;
+        _channels.values.forEach((element) => element._port = p);
+      } catch (e) {
+        throw PythonChannelRunError(output: sp);
+      }
+      await _process.exitCode;
+    } catch (e) {}
     // print('stoped');
-
-    await run();
   }
 
   void bindChannel(Channel channel) {
     channel._port = _port;
-    _channels.add(channel);
+    _channels.addAll({channel.name: channel});
   }
 
   /// get the path of the exe file relative to the program
@@ -74,5 +76,17 @@ class _Host {
     List l = Platform.resolvedExecutable.split('\\');
     l.removeLast();
     return '${l.join('\\')}\\$releasePath';
+  }
+
+  void disconnect() async {
+    await _stderrSub?.cancel();
+    for (var c in _channels.values) {
+      c._disconnect();
+    }
+  }
+
+  void unbindChannel(String name) async {
+    _channels[name]!._disconnect();
+    _channels.remove(name);
   }
 }

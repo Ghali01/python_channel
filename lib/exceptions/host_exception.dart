@@ -10,3 +10,14 @@ class HostNotFoundException implements Exception {
     return '$name host not found';
   }
 }
+
+class ChannelNotFoundException implements Exception {
+  String name;
+  ChannelNotFoundException({
+    required this.name,
+  });
+  @override
+  String toString() {
+    return '$name channel not found';
+  }
+}

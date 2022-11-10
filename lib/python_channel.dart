@@ -1,5 +1,6 @@
 library pythonChannel;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -46,6 +47,42 @@ class PythonChannelPlugin {
   static void bindChannel(String hostName, Channel channel) {
     if (_hosts.containsKey(hostName)) {
       _hosts[hostName]!.bindChannel(channel);
+    } else {
+      throw HostNotFoundException(name: hostName);
+    }
+  }
+
+  /// get bound channel
+  static Channel getChannel(String hostName, String channelName) {
+    if (!_hosts.containsKey(hostName)) {
+      throw HostNotFoundException(name: hostName);
+    } else {
+      if (!_hosts[hostName]!._channels.containsKey(channelName)) {
+        throw ChannelNotFoundException(name: channelName);
+      } else {
+        return _hosts[hostName]!._channels[channelName]!;
+      }
+    }
+  }
+
+  /// unbind channel
+  static void unbindChannel(String hostName, String channelName) {
+    if (!_hosts.containsKey(hostName)) {
+      throw HostNotFoundException(name: hostName);
+    } else {
+      if (!_hosts[hostName]!._channels.containsKey(channelName)) {
+        throw ChannelNotFoundException(name: channelName);
+      } else {
+        _hosts[hostName]!.unbindChannel(channelName);
+      }
+    }
+  }
+
+  /// unbind host
+  static unbindHost(String hostName) {
+    if (_hosts.containsKey(hostName)) {
+      _hosts[hostName]!.disconnect();
+      _hosts.remove(hostName);
     } else {
       throw HostNotFoundException(name: hostName);
     }

@@ -117,6 +117,26 @@ methodChannel.invokeMethod('sayHello', {"name": 'ghale'})
         .then((reply) => print(reply));
 ```
 
+### 5. get channel
+
+You can access bound channel from anywhere using `PythonChannelPlugin.getChannel()`, This method take two parameters the `hostName` and `channelName`
+
+#### get channel example
+
+```dart
+MethodChannel helloChannel = PythonChannelPlugin.getChannel('sayHello', 'sayHi') as MethodChannel;
+```
+
+### 6. unbind host
+
+You can unbind host by calling `PythonChannelPlugin.unbindHost()`, This method take one parameter, that parameter is the host name. When unbind host the host process will be killed with it's all channels.
+
+#### unbind host example
+
+```dart
+ PythonChannelPlugin.unbindHost('sayHello');
+```
+
 ## MethodChannel
 
 There is some notes we have to mention to about MethodChannel usage.

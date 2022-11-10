@@ -1,6 +1,6 @@
 name: python_channel
-description: with this package developers can use python with flutter
-version: 0.0.1
+description: with this package developers can use python with flutter to build beautiful and powerful applications 
+version: 0.0.2
 homepage: https://github.com/Ghali01/python_channel
 repository: https://github.com/Ghali01/python_channel
 issue_tracker: https://github.com/Ghali01/python_channel/issues

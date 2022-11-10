@@ -9,7 +9,10 @@ abstract class Channel<O, I> {
   late Stream<_Message> _dataMessages;
   late Stream<_Message> _replyMessages;
   int? _port;
+  StreamSubscription? _subscription;
+
   void Function(I, Reply<O>)? _handler;
+
   Channel({
     required this.name,
   }) {
@@ -84,10 +87,10 @@ abstract class Channel<O, I> {
     bool connected = true;
     List<int> buffer = [];
 
-    //add to the buffer
-    _socket!.listen((data) {
+    // add to the buffer
+    _subscription = _socket!.listen((data) {
       buffer.addAll(data);
-    }, onDone: () => connected = false);
+    }, onDone: () => connected = false, cancelOnError: true);
 
     // if there is message in the buffer yield it
     while (connected) {
@@ -203,5 +206,11 @@ abstract class Channel<O, I> {
     try {
       _socket!.add(msgBuffer);
     } catch (e) {}
+  }
+
+  void _disconnect() async {
+    await _subscription?.cancel();
+    await _socket?.close();
+    _socket = null;
   }
 }
